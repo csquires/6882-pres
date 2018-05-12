@@ -143,7 +143,7 @@ $(document).ready(function () {
 </style>
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("test.Rmd");
+  window.initializeSourceEmbed("maps.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>
@@ -172,82 +172,26 @@ $(document).ready(function () {
 
 
 <!-- rnb-text-begin -->
-<p>Let’s put all packages that need to be installed here</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5zdGFsbC5wYWNrYWdlcygnc3AnKVxuaW5zdGFsbC5wYWNrYWdlcygnc3BkZXAnKVxuaW5zdGFsbC5wYWNrYWdlcygnbWFwbWlzYycpXG5pbnN0YWxsLnBhY2thZ2VzKCdtYXB0b29scycpXG5pbnN0YWxsLnBhY2thZ2VzKCdyd29ybGRtYXAnKVxuaW5zdGFsbC5wYWNrYWdlcygnc2NhbGVzJylcbmluc3RhbGwucGFja2FnZXMoJ1JDb2xvckJyZXdlcicpXG5pbnN0YWxsLnBhY2thZ2VzKCdkcGx5cicpXG5gYGAifQ== -->
-<pre class="r"><code>install.packages('sp')
-install.packages('spdep')
-install.packages('mapmisc')
-install.packages('maptools')
-install.packages('rworldmap')
-install.packages('scales')
-install.packages('RColorBrewer')
-install.packages('dplyr')</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShiYXllc3Bsb3QpXG5saWJyYXJ5KHNwZGVwKVxubGlicmFyeShtYXBtaXNjKVxubGlicmFyeShtYXB0b29scylcbmxpYnJhcnkocndvcmxkbWFwKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShiYXllc3Bsb3QpXG5saWJyYXJ5KHNwZGVwKVxubGlicmFyeShtYXBtaXNjKVxubGlicmFyeShtYXB0b29scylcbmxpYnJhcnkocndvcmxkbWFwKVxubGlicmFyeShzY2FsZXMpXG5saWJyYXJ5KFJDb2xvckJyZXdlcilcbmxpYnJhcnkoZHBseXIpXG5sb2FkKCdiYXllcy12aXMuUkRhdGEnKVxuYGBgIn0= -->
 <pre class="r"><code>library(bayesplot)
 library(spdep)
 library(mapmisc)
 library(maptools)
-library(rworldmap)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIyMjIFdlbGNvbWUgdG8gcndvcmxkbWFwICMjI1xuRm9yIGEgc2hvcnQgaW50cm9kdWN0aW9uIHR5cGUgOiBcdCB2aWduZXR0ZSgncndvcmxkbWFwJylcbiJ9 -->
-<pre><code>### Welcome to rworldmap ###
-For a short introduction type :      vignette('rworldmap')</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShzY2FsZXMpXG5gYGAifQ== -->
-<pre class="r"><code>library(scales)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYc2NhbGVz4oCZXG5cblRoZSBmb2xsb3dpbmcgb2JqZWN0IGlzIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6dmlyaWRpc+KAmTpcblxuICAgIHZpcmlkaXNfcGFsXG4ifQ== -->
-<pre><code>
-Attaching package: ‘scales’
-
-The following object is masked from ‘package:viridis’:
-
-    viridis_pal</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShSQ29sb3JCcmV3ZXIpXG5saWJyYXJ5KGRwbHlyKVxuYGBgIn0= -->
-<pre class="r"><code>library(RColorBrewer)
-library(dplyr)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYZHBseXLigJlcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnJhc3RlcuKAmTpcblxuICAgIGludGVyc2VjdCwgc2VsZWN0LCB1bmlvblxuXG5UaGUgZm9sbG93aW5nIG9iamVjdHMgYXJlIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6c3RhdHPigJk6XG5cbiAgICBmaWx0ZXIsIGxhZ1xuXG5UaGUgZm9sbG93aW5nIG9iamVjdHMgYXJlIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6YmFzZeKAmTpcblxuICAgIGludGVyc2VjdCwgc2V0ZGlmZiwgc2V0ZXF1YWwsIHVuaW9uXG4ifQ== -->
-<pre><code>
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:raster’:
-
-    intersect, select, union
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9hZCgnYmF5ZXMtdmlzLlJEYXRhJylcbmBgYCJ9 -->
-<pre class="r"><code>load('bayes-vis.RData')</code></pre>
+library(rworldmap)
+library(scales)
+library(RColorBrewer)
+library(dplyr)
+load('bayes-vis.RData')</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BkZiA9IGpvaW5Db3VudHJ5RGF0YTJNYXAoR01AZGF0YSwgbmFtZUpvaW5Db2x1bW49J2lzbzMnKVxuYGBgIn0= -->
-<pre class="r"><code>spdf = joinCountryData2Map(GM@data, nameJoinColumn='iso3')</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiMjk4MCBjb2RlcyBmcm9tIHlvdXIgZGF0YSBzdWNjZXNzZnVsbHkgbWF0Y2hlZCBjb3VudHJpZXMgaW4gdGhlIG1hcFxuMCBjb2RlcyBmcm9tIHlvdXIgZGF0YSBmYWlsZWQgdG8gbWF0Y2ggd2l0aCBhIGNvdW50cnkgY29kZSBpbiB0aGUgbWFwXG4xNDMgY29kZXMgZnJvbSB0aGUgbWFwIHdlcmVuJ3QgcmVwcmVzZW50ZWQgaW4geW91ciBkYXRhXG4ifQ== -->
-<pre><code>2980 codes from your data successfully matched countries in the map
-0 codes from your data failed to match with a country code in the map
-143 codes from the map weren't represented in your data</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjb2RlIG1pc3NpbmdzXG5zcGRmJHN1cGVyX3JlZ2lvbltpcy5uYShzcGRmJHN1cGVyX3JlZ2lvbikgJiBzcGRmJGNvbnRpbmVudCA9PSBcIkV1cmFzaWFcIl0gPC0gNFxuc3BkZiRzdXBlcl9yZWdpb25baXMubmEoc3BkZiRzdXBlcl9yZWdpb24pICYgc3BkZiRjb250aW5lbnQgPT0gXCJTb3V0aCBBbWVyaWNhXCJdIDwtIDVcbnNwZGYkc3VwZXJfcmVnaW9uW2lzLm5hKHNwZGYkc3VwZXJfcmVnaW9uKSAmIHNwZGYkY29udGluZW50ID09IFwiQWZyaWNhXCJdIDwtIDdcbnNwZGYkc3VwZXJfcmVnaW9uW3NwZGYkTkFNRSAlaW4lIGMoXCJBbGdlcmlhXCIsIFwiTGlieWFcIiwgXCJZZW1lblwiLCBcIlN5cmlhXCIsIFwiSXJhcVwiKV0gPC0gMlxuc3BkZiRzdXBlcl9yZWdpb25bc3BkZiROQU1FICVpbiUgYyhcIlRhaXdhblwiLCBcIlZpZXRuYW1cIiwgXCJDYW1ib2RpYVwiLCBcIkxhb3NcIiwgXCJQYXB1YSBOZXcgR3VpbmVhXCIsIFwiTi4gS29yZWFcIiwgXCJTcmkgTGFua2FcIildIDwtIDZcbnNwZGYkc3VwZXJfcmVnaW9uW3NwZGYkTkFNRSAlaW4lIFwiTmVwYWxcIl0gPC0gM1xuc3BkZiRzdXBlcl9yZWdpb25bc3BkZiROQU1FICVpbiUgYyhcIkdyZWVubGFuZFwiLCBcIlcuIFNhaGFyYVwiKV0gPC0gTkFcbmBgYCJ9 -->
-<pre class="r"><code># code missings
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BkZiA9IGpvaW5Db3VudHJ5RGF0YTJNYXAoR01AZGF0YSwgbmFtZUpvaW5Db2x1bW49J2lzbzMnKVxuIyBjb2RlIG1pc3NpbmdzXG5zcGRmJHN1cGVyX3JlZ2lvbltpcy5uYShzcGRmJHN1cGVyX3JlZ2lvbikgJiBzcGRmJGNvbnRpbmVudCA9PSBcIkV1cmFzaWFcIl0gPC0gNFxuc3BkZiRzdXBlcl9yZWdpb25baXMubmEoc3BkZiRzdXBlcl9yZWdpb24pICYgc3BkZiRjb250aW5lbnQgPT0gXCJTb3V0aCBBbWVyaWNhXCJdIDwtIDVcbnNwZGYkc3VwZXJfcmVnaW9uW2lzLm5hKHNwZGYkc3VwZXJfcmVnaW9uKSAmIHNwZGYkY29udGluZW50ID09IFwiQWZyaWNhXCJdIDwtIDdcbnNwZGYkc3VwZXJfcmVnaW9uW3NwZGYkTkFNRSAlaW4lIGMoXCJBbGdlcmlhXCIsIFwiTGlieWFcIiwgXCJZZW1lblwiLCBcIlN5cmlhXCIsIFwiSXJhcVwiKV0gPC0gMlxuc3BkZiRzdXBlcl9yZWdpb25bc3BkZiROQU1FICVpbiUgYyhcIlRhaXdhblwiLCBcIlZpZXRuYW1cIiwgXCJDYW1ib2RpYVwiLCBcIkxhb3NcIiwgXCJQYXB1YSBOZXcgR3VpbmVhXCIsIFwiTi4gS29yZWFcIiwgXCJTcmkgTGFua2FcIildIDwtIDZcbnNwZGYkc3VwZXJfcmVnaW9uW3NwZGYkTkFNRSAlaW4lIFwiTmVwYWxcIl0gPC0gM1xuc3BkZiRzdXBlcl9yZWdpb25bc3BkZiROQU1FICVpbiUgYyhcIkdyZWVubGFuZFwiLCBcIlcuIFNhaGFyYVwiKV0gPC0gTkFcbmBgYCJ9 -->
+<pre class="r"><code>spdf = joinCountryData2Map(GM@data, nameJoinColumn='iso3')
+# code missings
 spdf$super_region[is.na(spdf$super_region) &amp; spdf$continent == &quot;Eurasia&quot;] &lt;- 4
 spdf$super_region[is.na(spdf$super_region) &amp; spdf$continent == &quot;South America&quot;] &lt;- 5
 spdf$super_region[is.na(spdf$super_region) &amp; spdf$continent == &quot;Africa&quot;] &lt;- 7
@@ -306,7 +250,7 @@ GM@data$cluster_region &lt;-
 <!-- rnb-chunk-begin -->
 <!-- rnb-chunk-end -->
 
-<div id="rmd-source-code">LS0tCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCkxldCdzIHB1dCBhbGwgcGFja2FnZXMgdGhhdCBuZWVkIHRvIGJlIGluc3RhbGxlZCBoZXJlCmBgYHtyfQppbnN0YWxsLnBhY2thZ2VzKCdzcCcpCmluc3RhbGwucGFja2FnZXMoJ3NwZGVwJykKaW5zdGFsbC5wYWNrYWdlcygnbWFwbWlzYycpCmluc3RhbGwucGFja2FnZXMoJ21hcHRvb2xzJykKaW5zdGFsbC5wYWNrYWdlcygncndvcmxkbWFwJykKaW5zdGFsbC5wYWNrYWdlcygnc2NhbGVzJykKaW5zdGFsbC5wYWNrYWdlcygnUkNvbG9yQnJld2VyJykKaW5zdGFsbC5wYWNrYWdlcygnZHBseXInKQpgYGAKCmBgYHtyfQpsaWJyYXJ5KGJheWVzcGxvdCkKbGlicmFyeShzcGRlcCkKbGlicmFyeShtYXBtaXNjKQpsaWJyYXJ5KG1hcHRvb2xzKQpsaWJyYXJ5KHJ3b3JsZG1hcCkKbGlicmFyeShzY2FsZXMpCmxpYnJhcnkoUkNvbG9yQnJld2VyKQpsaWJyYXJ5KGRwbHlyKQpsb2FkKCdiYXllcy12aXMuUkRhdGEnKQpgYGAKCgpgYGB7cn0Kc3BkZiA9IGpvaW5Db3VudHJ5RGF0YTJNYXAoR01AZGF0YSwgbmFtZUpvaW5Db2x1bW49J2lzbzMnKQojIGNvZGUgbWlzc2luZ3MKc3BkZiRzdXBlcl9yZWdpb25baXMubmEoc3BkZiRzdXBlcl9yZWdpb24pICYgc3BkZiRjb250aW5lbnQgPT0gIkV1cmFzaWEiXSA8LSA0CnNwZGYkc3VwZXJfcmVnaW9uW2lzLm5hKHNwZGYkc3VwZXJfcmVnaW9uKSAmIHNwZGYkY29udGluZW50ID09ICJTb3V0aCBBbWVyaWNhIl0gPC0gNQpzcGRmJHN1cGVyX3JlZ2lvbltpcy5uYShzcGRmJHN1cGVyX3JlZ2lvbikgJiBzcGRmJGNvbnRpbmVudCA9PSAiQWZyaWNhIl0gPC0gNwpzcGRmJHN1cGVyX3JlZ2lvbltzcGRmJE5BTUUgJWluJSBjKCJBbGdlcmlhIiwgIkxpYnlhIiwgIlllbWVuIiwgIlN5cmlhIiwgIklyYXEiKV0gPC0gMgpzcGRmJHN1cGVyX3JlZ2lvbltzcGRmJE5BTUUgJWluJSBjKCJUYWl3YW4iLCAiVmlldG5hbSIsICJDYW1ib2RpYSIsICJMYW9zIiwgIlBhcHVhIE5ldyBHdWluZWEiLCAiTi4gS29yZWEiLCAiU3JpIExhbmthIildIDwtIDYKc3BkZiRzdXBlcl9yZWdpb25bc3BkZiROQU1FICVpbiUgIk5lcGFsIl0gPC0gMwpzcGRmJHN1cGVyX3JlZ2lvbltzcGRmJE5BTUUgJWluJSBjKCJHcmVlbmxhbmQiLCAiVy4gU2FoYXJhIildIDwtIE5BCmBgYAoKYGBge3J9Cm9wYXIgPC0gcGFyKCkKcG5nKGZpbGVuYW1lID0gInBsb3RzL21hcC13aG8ucG5nIiwgcmVzID0gNTAwLCB3aWR0aCA9IDEwMDAsIGhlaWdodCA9IDYwMCkKcGFyKG1hcj1jKDAsMCwwLDApKQptYXBDb3VudHJ5RGF0YSgKICBzcGRmLAogIG5hbWVDb2x1bW5Ub1Bsb3QgPSAic3VwZXJfcmVnaW9uIiwKICBjYXRNZXRob2QgPSAiY2F0ZWdvcmljYWwiLAogIGNvbG91clBhbGV0dGUgPSByZXYoCiAgICBzY2FsZXM6Omh1ZV9wYWwoCiAgICAgIGggPSBjKDAsIDM2MCkgKyAxNSwKICAgICAgYyA9IDEwMCwKICAgICAgbCA9IDY1LAogICAgICBoLnN0YXJ0ID0gMCwKICAgICAgZGlyZWN0aW9uID0gMQogICAgKSg3KQogICksCiAgYWRkTGVnZW5kID0gRkFMU0UsCiAgbWFwVGl0bGUgPSAiIiwKICBsd2QgPSAwLjI1CikKZGV2Lm9mZigpCnBhcihvcGFyKQpgYGAKCmBgYHtyfQojIE1hcCBvZiByZWdpb25zIG9idGFpbmVkIGZyb20gY2x1c3RlcmluZyAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KYXZlcmFnZSA8LQogIEdNQGRhdGEgJT4lCiAgZ3JvdXBfYnkoaXNvMykgJT4lCiAgc3VtbWFyaXNlKHBtMjUgPSBtZWFuKHBtMjUpKQpkIDwtIGRpc3QoYXZlcmFnZSkKaGggPC0gaGNsdXN0KGQpCmNsdXN0IDwtIGN1dHJlZShoaCxrID0gNikKR01AZGF0YSRjbHVzdGVyX3JlZ2lvbiA8LQogIHNhcHBseShHTUBkYXRhJGlzbzMsIGZ1bmN0aW9uKHgpIGNsdXN0W3doaWNoKGF2ZXJhZ2UkaXNvMyA9PSB4KV0pCmBgYAoKCmBgYHtyfQoKYGBg</div>
+<div id="rmd-source-code">LS0tCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCmBgYHtyfQpsaWJyYXJ5KGJheWVzcGxvdCkKbGlicmFyeShzcGRlcCkKbGlicmFyeShtYXBtaXNjKQpsaWJyYXJ5KG1hcHRvb2xzKQpsaWJyYXJ5KHJ3b3JsZG1hcCkKbGlicmFyeShzY2FsZXMpCmxpYnJhcnkoUkNvbG9yQnJld2VyKQpsaWJyYXJ5KGRwbHlyKQpsb2FkKCdiYXllcy12aXMuUkRhdGEnKQpgYGAKCgpgYGB7cn0Kc3BkZiA9IGpvaW5Db3VudHJ5RGF0YTJNYXAoR01AZGF0YSwgbmFtZUpvaW5Db2x1bW49J2lzbzMnKQojIGNvZGUgbWlzc2luZ3MKc3BkZiRzdXBlcl9yZWdpb25baXMubmEoc3BkZiRzdXBlcl9yZWdpb24pICYgc3BkZiRjb250aW5lbnQgPT0gIkV1cmFzaWEiXSA8LSA0CnNwZGYkc3VwZXJfcmVnaW9uW2lzLm5hKHNwZGYkc3VwZXJfcmVnaW9uKSAmIHNwZGYkY29udGluZW50ID09ICJTb3V0aCBBbWVyaWNhIl0gPC0gNQpzcGRmJHN1cGVyX3JlZ2lvbltpcy5uYShzcGRmJHN1cGVyX3JlZ2lvbikgJiBzcGRmJGNvbnRpbmVudCA9PSAiQWZyaWNhIl0gPC0gNwpzcGRmJHN1cGVyX3JlZ2lvbltzcGRmJE5BTUUgJWluJSBjKCJBbGdlcmlhIiwgIkxpYnlhIiwgIlllbWVuIiwgIlN5cmlhIiwgIklyYXEiKV0gPC0gMgpzcGRmJHN1cGVyX3JlZ2lvbltzcGRmJE5BTUUgJWluJSBjKCJUYWl3YW4iLCAiVmlldG5hbSIsICJDYW1ib2RpYSIsICJMYW9zIiwgIlBhcHVhIE5ldyBHdWluZWEiLCAiTi4gS29yZWEiLCAiU3JpIExhbmthIildIDwtIDYKc3BkZiRzdXBlcl9yZWdpb25bc3BkZiROQU1FICVpbiUgIk5lcGFsIl0gPC0gMwpzcGRmJHN1cGVyX3JlZ2lvbltzcGRmJE5BTUUgJWluJSBjKCJHcmVlbmxhbmQiLCAiVy4gU2FoYXJhIildIDwtIE5BCmBgYAoKYGBge3J9Cm9wYXIgPC0gcGFyKCkKcG5nKGZpbGVuYW1lID0gInBsb3RzL21hcC13aG8ucG5nIiwgcmVzID0gNTAwLCB3aWR0aCA9IDEwMDAsIGhlaWdodCA9IDYwMCkKcGFyKG1hcj1jKDAsMCwwLDApKQptYXBDb3VudHJ5RGF0YSgKICBzcGRmLAogIG5hbWVDb2x1bW5Ub1Bsb3QgPSAic3VwZXJfcmVnaW9uIiwKICBjYXRNZXRob2QgPSAiY2F0ZWdvcmljYWwiLAogIGNvbG91clBhbGV0dGUgPSByZXYoCiAgICBzY2FsZXM6Omh1ZV9wYWwoCiAgICAgIGggPSBjKDAsIDM2MCkgKyAxNSwKICAgICAgYyA9IDEwMCwKICAgICAgbCA9IDY1LAogICAgICBoLnN0YXJ0ID0gMCwKICAgICAgZGlyZWN0aW9uID0gMQogICAgKSg3KQogICksCiAgYWRkTGVnZW5kID0gRkFMU0UsCiAgbWFwVGl0bGUgPSAiIiwKICBsd2QgPSAwLjI1CikKZGV2Lm9mZigpCnBhcihvcGFyKQpgYGAKCmBgYHtyfQojIE1hcCBvZiByZWdpb25zIG9idGFpbmVkIGZyb20gY2x1c3RlcmluZyAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KYXZlcmFnZSA8LQogIEdNQGRhdGEgJT4lCiAgZ3JvdXBfYnkoaXNvMykgJT4lCiAgc3VtbWFyaXNlKHBtMjUgPSBtZWFuKHBtMjUpKQpkIDwtIGRpc3QoYXZlcmFnZSkKaGggPC0gaGNsdXN0KGQpCmNsdXN0IDwtIGN1dHJlZShoaCxrID0gNikKR01AZGF0YSRjbHVzdGVyX3JlZ2lvbiA8LQogIHNhcHBseShHTUBkYXRhJGlzbzMsIGZ1bmN0aW9uKHgpIGNsdXN0W3doaWNoKGF2ZXJhZ2UkaXNvMyA9PSB4KV0pCmBgYAoKCmBgYHtyfQoKYGBg</div>
 
 
 
