@@ -246,9 +246,67 @@ The following objects are masked from ‘package:base’:
 0 codes from your data failed to match with a country code in the map
 143 codes from the map weren't represented in your data</code></pre>
 <!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjb2RlIG1pc3NpbmdzXG5zcGRmJHN1cGVyX3JlZ2lvbltpcy5uYShzcGRmJHN1cGVyX3JlZ2lvbikgJiBzcGRmJGNvbnRpbmVudCA9PSBcIkV1cmFzaWFcIl0gPC0gNFxuc3BkZiRzdXBlcl9yZWdpb25baXMubmEoc3BkZiRzdXBlcl9yZWdpb24pICYgc3BkZiRjb250aW5lbnQgPT0gXCJTb3V0aCBBbWVyaWNhXCJdIDwtIDVcbnNwZGYkc3VwZXJfcmVnaW9uW2lzLm5hKHNwZGYkc3VwZXJfcmVnaW9uKSAmIHNwZGYkY29udGluZW50ID09IFwiQWZyaWNhXCJdIDwtIDdcbnNwZGYkc3VwZXJfcmVnaW9uW3NwZGYkTkFNRSAlaW4lIGMoXCJBbGdlcmlhXCIsIFwiTGlieWFcIiwgXCJZZW1lblwiLCBcIlN5cmlhXCIsIFwiSXJhcVwiKV0gPC0gMlxuc3BkZiRzdXBlcl9yZWdpb25bc3BkZiROQU1FICVpbiUgYyhcIlRhaXdhblwiLCBcIlZpZXRuYW1cIiwgXCJDYW1ib2RpYVwiLCBcIkxhb3NcIiwgXCJQYXB1YSBOZXcgR3VpbmVhXCIsIFwiTi4gS29yZWFcIiwgXCJTcmkgTGFua2FcIildIDwtIDZcbnNwZGYkc3VwZXJfcmVnaW9uW3NwZGYkTkFNRSAlaW4lIFwiTmVwYWxcIl0gPC0gM1xuc3BkZiRzdXBlcl9yZWdpb25bc3BkZiROQU1FICVpbiUgYyhcIkdyZWVubGFuZFwiLCBcIlcuIFNhaGFyYVwiKV0gPC0gTkFcbmBgYCJ9 -->
+<pre class="r"><code># code missings
+spdf$super_region[is.na(spdf$super_region) &amp; spdf$continent == &quot;Eurasia&quot;] &lt;- 4
+spdf$super_region[is.na(spdf$super_region) &amp; spdf$continent == &quot;South America&quot;] &lt;- 5
+spdf$super_region[is.na(spdf$super_region) &amp; spdf$continent == &quot;Africa&quot;] &lt;- 7
+spdf$super_region[spdf$NAME %in% c(&quot;Algeria&quot;, &quot;Libya&quot;, &quot;Yemen&quot;, &quot;Syria&quot;, &quot;Iraq&quot;)] &lt;- 2
+spdf$super_region[spdf$NAME %in% c(&quot;Taiwan&quot;, &quot;Vietnam&quot;, &quot;Cambodia&quot;, &quot;Laos&quot;, &quot;Papua New Guinea&quot;, &quot;N. Korea&quot;, &quot;Sri Lanka&quot;)] &lt;- 6
+spdf$super_region[spdf$NAME %in% &quot;Nepal&quot;] &lt;- 3
+spdf$super_region[spdf$NAME %in% c(&quot;Greenland&quot;, &quot;W. Sahara&quot;)] &lt;- NA</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxub3BhciA8LSBwYXIoKVxucG5nKGZpbGVuYW1lID0gXCJwbG90cy9tYXAtd2hvLnBuZ1wiLCByZXMgPSA1MDAsIHdpZHRoID0gMTAwMCwgaGVpZ2h0ID0gNjAwKVxucGFyKG1hcj1jKDAsMCwwLDApKVxubWFwQ291bnRyeURhdGEoXG4gIHNwZGYsXG4gIG5hbWVDb2x1bW5Ub1Bsb3QgPSBcInN1cGVyX3JlZ2lvblwiLFxuICBjYXRNZXRob2QgPSBcImNhdGVnb3JpY2FsXCIsXG4gIGNvbG91clBhbGV0dGUgPSByZXYoXG4gICAgc2NhbGVzOjpodWVfcGFsKFxuICAgICAgaCA9IGMoMCwgMzYwKSArIDE1LFxuICAgICAgYyA9IDEwMCxcbiAgICAgIGwgPSA2NSxcbiAgICAgIGguc3RhcnQgPSAwLFxuICAgICAgZGlyZWN0aW9uID0gMVxuICAgICkoNylcbiAgKSxcbiAgYWRkTGVnZW5kID0gRkFMU0UsXG4gIG1hcFRpdGxlID0gXCJcIixcbiAgbHdkID0gMC4yNVxuKVxuZGV2Lm9mZigpXG5wYXIob3BhcilcbmBgYCJ9 -->
+<pre class="r"><code>opar &lt;- par()
+png(filename = &quot;plots/map-who.png&quot;, res = 500, width = 1000, height = 600)
+par(mar=c(0,0,0,0))
+mapCountryData(
+  spdf,
+  nameColumnToPlot = &quot;super_region&quot;,
+  catMethod = &quot;categorical&quot;,
+  colourPalette = rev(
+    scales::hue_pal(
+      h = c(0, 360) + 15,
+      c = 100,
+      l = 65,
+      h.start = 0,
+      direction = 1
+    )(7)
+  ),
+  addLegend = FALSE,
+  mapTitle = &quot;&quot;,
+  lwd = 0.25
+)
+dev.off()
+par(opar)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBNYXAgb2YgcmVnaW9ucyBvYnRhaW5lZCBmcm9tIGNsdXN0ZXJpbmcgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXG5hdmVyYWdlIDwtXG4gIEdNQGRhdGEgJT4lXG4gIGdyb3VwX2J5KGlzbzMpICU+JVxuICBzdW1tYXJpc2UocG0yNSA9IG1lYW4ocG0yNSkpXG5kIDwtIGRpc3QoYXZlcmFnZSlcbmhoIDwtIGhjbHVzdChkKVxuY2x1c3QgPC0gY3V0cmVlKGhoLGsgPSA2KVxuR01AZGF0YSRjbHVzdGVyX3JlZ2lvbiA8LVxuICBzYXBwbHkoR01AZGF0YSRpc28zLCBmdW5jdGlvbih4KSBjbHVzdFt3aGljaChhdmVyYWdlJGlzbzMgPT0geCldKVxuYGBgIn0= -->
+<pre class="r"><code># Map of regions obtained from clustering ---------------------------------
+average &lt;-
+  GM@data %&gt;%
+  group_by(iso3) %&gt;%
+  summarise(pm25 = mean(pm25))
+d &lt;- dist(average)
+hh &lt;- hclust(d)
+clust &lt;- cutree(hh,k = 6)
+GM@data$cluster_region &lt;-
+  sapply(GM@data$iso3, function(x) clust[which(average$iso3 == x)])</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
 <!-- rnb-chunk-end -->
 
-<div id="rmd-source-code">LS0tCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCkxldCdzIHB1dCBhbGwgcGFja2FnZXMgdGhhdCBuZWVkIHRvIGJlIGluc3RhbGxlZCBoZXJlCmBgYHtyfQppbnN0YWxsLnBhY2thZ2VzKCdzcCcpCmluc3RhbGwucGFja2FnZXMoJ3NwZGVwJykKaW5zdGFsbC5wYWNrYWdlcygnbWFwbWlzYycpCmluc3RhbGwucGFja2FnZXMoJ21hcHRvb2xzJykKaW5zdGFsbC5wYWNrYWdlcygncndvcmxkbWFwJykKaW5zdGFsbC5wYWNrYWdlcygnc2NhbGVzJykKaW5zdGFsbC5wYWNrYWdlcygnUkNvbG9yQnJld2VyJykKaW5zdGFsbC5wYWNrYWdlcygnZHBseXInKQpgYGAKCmBgYHtyfQpsaWJyYXJ5KGJheWVzcGxvdCkKbGlicmFyeShzcGRlcCkKbGlicmFyeShtYXBtaXNjKQpsaWJyYXJ5KG1hcHRvb2xzKQpsaWJyYXJ5KHJ3b3JsZG1hcCkKbGlicmFyeShzY2FsZXMpCmxpYnJhcnkoUkNvbG9yQnJld2VyKQpsaWJyYXJ5KGRwbHlyKQpsb2FkKCdiYXllcy12aXMuUkRhdGEnKQpgYGAKCgpgYGB7cn0Kc3BkZiA9IGpvaW5Db3VudHJ5RGF0YTJNYXAoR01AZGF0YSwgbmFtZUpvaW5Db2x1bW49J2lzbzMnKQpgYGAK</div>
+<div id="rmd-source-code">LS0tCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCkxldCdzIHB1dCBhbGwgcGFja2FnZXMgdGhhdCBuZWVkIHRvIGJlIGluc3RhbGxlZCBoZXJlCmBgYHtyfQppbnN0YWxsLnBhY2thZ2VzKCdzcCcpCmluc3RhbGwucGFja2FnZXMoJ3NwZGVwJykKaW5zdGFsbC5wYWNrYWdlcygnbWFwbWlzYycpCmluc3RhbGwucGFja2FnZXMoJ21hcHRvb2xzJykKaW5zdGFsbC5wYWNrYWdlcygncndvcmxkbWFwJykKaW5zdGFsbC5wYWNrYWdlcygnc2NhbGVzJykKaW5zdGFsbC5wYWNrYWdlcygnUkNvbG9yQnJld2VyJykKaW5zdGFsbC5wYWNrYWdlcygnZHBseXInKQpgYGAKCmBgYHtyfQpsaWJyYXJ5KGJheWVzcGxvdCkKbGlicmFyeShzcGRlcCkKbGlicmFyeShtYXBtaXNjKQpsaWJyYXJ5KG1hcHRvb2xzKQpsaWJyYXJ5KHJ3b3JsZG1hcCkKbGlicmFyeShzY2FsZXMpCmxpYnJhcnkoUkNvbG9yQnJld2VyKQpsaWJyYXJ5KGRwbHlyKQpsb2FkKCdiYXllcy12aXMuUkRhdGEnKQpgYGAKCgpgYGB7cn0Kc3BkZiA9IGpvaW5Db3VudHJ5RGF0YTJNYXAoR01AZGF0YSwgbmFtZUpvaW5Db2x1bW49J2lzbzMnKQojIGNvZGUgbWlzc2luZ3MKc3BkZiRzdXBlcl9yZWdpb25baXMubmEoc3BkZiRzdXBlcl9yZWdpb24pICYgc3BkZiRjb250aW5lbnQgPT0gIkV1cmFzaWEiXSA8LSA0CnNwZGYkc3VwZXJfcmVnaW9uW2lzLm5hKHNwZGYkc3VwZXJfcmVnaW9uKSAmIHNwZGYkY29udGluZW50ID09ICJTb3V0aCBBbWVyaWNhIl0gPC0gNQpzcGRmJHN1cGVyX3JlZ2lvbltpcy5uYShzcGRmJHN1cGVyX3JlZ2lvbikgJiBzcGRmJGNvbnRpbmVudCA9PSAiQWZyaWNhIl0gPC0gNwpzcGRmJHN1cGVyX3JlZ2lvbltzcGRmJE5BTUUgJWluJSBjKCJBbGdlcmlhIiwgIkxpYnlhIiwgIlllbWVuIiwgIlN5cmlhIiwgIklyYXEiKV0gPC0gMgpzcGRmJHN1cGVyX3JlZ2lvbltzcGRmJE5BTUUgJWluJSBjKCJUYWl3YW4iLCAiVmlldG5hbSIsICJDYW1ib2RpYSIsICJMYW9zIiwgIlBhcHVhIE5ldyBHdWluZWEiLCAiTi4gS29yZWEiLCAiU3JpIExhbmthIildIDwtIDYKc3BkZiRzdXBlcl9yZWdpb25bc3BkZiROQU1FICVpbiUgIk5lcGFsIl0gPC0gMwpzcGRmJHN1cGVyX3JlZ2lvbltzcGRmJE5BTUUgJWluJSBjKCJHcmVlbmxhbmQiLCAiVy4gU2FoYXJhIildIDwtIE5BCmBgYAoKYGBge3J9Cm9wYXIgPC0gcGFyKCkKcG5nKGZpbGVuYW1lID0gInBsb3RzL21hcC13aG8ucG5nIiwgcmVzID0gNTAwLCB3aWR0aCA9IDEwMDAsIGhlaWdodCA9IDYwMCkKcGFyKG1hcj1jKDAsMCwwLDApKQptYXBDb3VudHJ5RGF0YSgKICBzcGRmLAogIG5hbWVDb2x1bW5Ub1Bsb3QgPSAic3VwZXJfcmVnaW9uIiwKICBjYXRNZXRob2QgPSAiY2F0ZWdvcmljYWwiLAogIGNvbG91clBhbGV0dGUgPSByZXYoCiAgICBzY2FsZXM6Omh1ZV9wYWwoCiAgICAgIGggPSBjKDAsIDM2MCkgKyAxNSwKICAgICAgYyA9IDEwMCwKICAgICAgbCA9IDY1LAogICAgICBoLnN0YXJ0ID0gMCwKICAgICAgZGlyZWN0aW9uID0gMQogICAgKSg3KQogICksCiAgYWRkTGVnZW5kID0gRkFMU0UsCiAgbWFwVGl0bGUgPSAiIiwKICBsd2QgPSAwLjI1CikKZGV2Lm9mZigpCnBhcihvcGFyKQpgYGAKCmBgYHtyfQojIE1hcCBvZiByZWdpb25zIG9idGFpbmVkIGZyb20gY2x1c3RlcmluZyAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KYXZlcmFnZSA8LQogIEdNQGRhdGEgJT4lCiAgZ3JvdXBfYnkoaXNvMykgJT4lCiAgc3VtbWFyaXNlKHBtMjUgPSBtZWFuKHBtMjUpKQpkIDwtIGRpc3QoYXZlcmFnZSkKaGggPC0gaGNsdXN0KGQpCmNsdXN0IDwtIGN1dHJlZShoaCxrID0gNikKR01AZGF0YSRjbHVzdGVyX3JlZ2lvbiA8LQogIHNhcHBseShHTUBkYXRhJGlzbzMsIGZ1bmN0aW9uKHgpIGNsdXN0W3doaWNoKGF2ZXJhZ2UkaXNvMyA9PSB4KV0pCmBgYAoKCmBgYHtyfQoKYGBg</div>
 
 
 

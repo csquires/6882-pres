@@ -1,0 +1,83 @@
+---
+output: html_notebook
+---
+
+Let's put all packages that need to be installed here
+```{r}
+install.packages('sp')
+install.packages('spdep')
+install.packages('mapmisc')
+install.packages('maptools')
+install.packages('rworldmap')
+install.packages('scales')
+install.packages('RColorBrewer')
+install.packages('dplyr')
+```
+
+```{r}
+library(bayesplot)
+library(spdep)
+library(mapmisc)
+library(maptools)
+library(rworldmap)
+library(scales)
+library(RColorBrewer)
+library(dplyr)
+load('bayes-vis.RData')
+```
+
+
+```{r}
+spdf = joinCountryData2Map(GM@data, nameJoinColumn='iso3')
+# code missings
+spdf$super_region[is.na(spdf$super_region) & spdf$continent == "Eurasia"] <- 4
+spdf$super_region[is.na(spdf$super_region) & spdf$continent == "South America"] <- 5
+spdf$super_region[is.na(spdf$super_region) & spdf$continent == "Africa"] <- 7
+spdf$super_region[spdf$NAME %in% c("Algeria", "Libya", "Yemen", "Syria", "Iraq")] <- 2
+spdf$super_region[spdf$NAME %in% c("Taiwan", "Vietnam", "Cambodia", "Laos", "Papua New Guinea", "N. Korea", "Sri Lanka")] <- 6
+spdf$super_region[spdf$NAME %in% "Nepal"] <- 3
+spdf$super_region[spdf$NAME %in% c("Greenland", "W. Sahara")] <- NA
+```
+
+```{r}
+opar <- par()
+png(filename = "plots/map-who.png", res = 500, width = 1000, height = 600)
+par(mar=c(0,0,0,0))
+mapCountryData(
+  spdf,
+  nameColumnToPlot = "super_region",
+  catMethod = "categorical",
+  colourPalette = rev(
+    scales::hue_pal(
+      h = c(0, 360) + 15,
+      c = 100,
+      l = 65,
+      h.start = 0,
+      direction = 1
+    )(7)
+  ),
+  addLegend = FALSE,
+  mapTitle = "",
+  lwd = 0.25
+)
+dev.off()
+par(opar)
+```
+
+```{r}
+# Map of regions obtained from clustering ---------------------------------
+average <-
+  GM@data %>%
+  group_by(iso3) %>%
+  summarise(pm25 = mean(pm25))
+d <- dist(average)
+hh <- hclust(d)
+clust <- cutree(hh,k = 6)
+GM@data$cluster_region <-
+  sapply(GM@data$iso3, function(x) clust[which(average$iso3 == x)])
+```
+
+
+```{r}
+
+```
