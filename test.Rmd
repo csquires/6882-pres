@@ -1,0 +1,32 @@
+---
+output: html_notebook
+---
+
+Let's put all packages that need to be installed here
+```{r}
+install.packages('sp')
+install.packages('spdep')
+install.packages('mapmisc')
+install.packages('maptools')
+install.packages('rworldmap')
+install.packages('scales')
+install.packages('RColorBrewer')
+install.packages('dplyr')
+```
+
+```{r}
+library(bayesplot)
+library(spdep)
+library(mapmisc)
+library(maptools)
+library(rworldmap)
+library(scales)
+library(RColorBrewer)
+library(dplyr)
+load('bayes-vis.RData')
+```
+
+
+```{r}
+spdf = joinCountryData2Map(GM@data, nameJoinColumn='iso3')
+```
