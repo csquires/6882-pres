@@ -56,18 +56,9 @@ region_color_manual = scale_color_manual(
   )
 
 plot1 <- ggplot(GM@data, aes(y = log_pm25, x = log_sat)) +
-  geom_point(
-    aes(color = super_region_name), 
-    alpha = 0.4,
-    size = rel(0.8)
-  ) + 
+  geom_point(aes(color = super_region_name), alpha = 0.4, size = rel(0.8)) + 
   region_color_manual +
-  geom_smooth(
-    method = lm, 
-    color = "black", 
-    size = 0.5, 
-    linetype = 2
-  ) + 
+  geom_smooth(method = lm, color = "black", size = 0.5, linetype = 2) + 
   coord_equal() +
   xylabs + 
   guides(color = guide_legend(
@@ -78,21 +69,31 @@ plot1 <- ggplot(GM@data, aes(y = log_pm25, x = log_sat)) +
 plot(plot1)
 ```
 
+```{r}
+r1 <- subset(GM@data, super_region==1)
+r2 <- subset(GM@data, super_region==2)
+r3 <- subset(GM@data, super_region==3)
+r4 <- subset(GM@data, super_region==4)
+r5 <- subset(GM@data, super_region==5)
+r6 <- subset(GM@data, super_region==6)
+r7 <- subset(GM@data, super_region==7)
+
+plot_r1 <- ggplot(r3, aes(y = log_pm25, x = log_sat)) +
+  geom_point(aes(colour = super_region_name), alpha = 0.2, size = rel(0.75)) + 
+  region_color_manual +
+  geom_smooth(aes(colour = super_region_name), method = lm) + 
+  coord_equal() +
+  xylabs + 
+  legend_none() 
+
+plot(plot_r1)
+```
 
 Same plot as above + separate fits for each super-region
 ```{r}
-plot2 <-
-  ggplot(GM@data, aes(
-    y = log_pm25,
-    x = log_sat
-  )) +
+plot2 <- ggplot(GM@data, aes(y = log_pm25, x = log_sat)) +
   geom_point(aes(colour = super_region_name), alpha = 0.2, size = rel(0.75)) + 
-  geom_smooth(
-    method = lm, 
-    color = "black", 
-    size = 0.5, 
-    linetype = 2
-  ) + 
+  geom_smooth(method = lm, color = "black", size = 0.5, linetype = 2) + 
   region_color_manual +
   geom_smooth(aes(colour = super_region_name), method = lm) + 
   coord_equal() +

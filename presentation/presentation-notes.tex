@@ -1,0 +1,34 @@
+\documentclass[]{article}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+%opening
+\title{6.882 Presentation: Visualization in Bayesian Workflow}
+\author{Tarek Mansour, Edgar Minasyan, Chandler Squires}
+\date{}
+
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\section*{Part 1 (Chandler): Overview and Model Choice}
+
+Throughout this course, we've developed a powerful toolbox. We've looked at modeling techniques like topic models and nonparametrics, and inference algorithms like ADVI and Hamiltonian Monte Carlo. While these are great in theory, as we've probably seen throughout the course of working on our projects, the hard part is putting these techniques into practice. To help us out with that, we've looked at a set of tools for evaluation.
+\\
+
+Last week, we talked about Simulation-Based Calibration, which provides a fundamental snanity check of whether or not our model is implemented correctly. Then on Thursday, we talked about some problems particular to MCMC samplers, like getting decent mixing, and we talked about some diagnostics we can do to fix any problems with mixing. Today, we come to the last topic in this section, and this class, which is a super useful one now that we're going out into the world to actually use these techniques, and that's actually coming up with a model and improving it until we think it explains our data. This paper outlines a workflow for this and gives us some visual tools we can use to look for places to improve our model.
+\\
+
+The approach the authors advocate is an iterative one of model extension, where we start with a simple model and make it more and more sophisticated until we're happy with how it explains the data. The 
+\begin{itemize}
+	\item Choosing a model (data to use, dependencies between variables, distributions)
+	\item Choosing prior (vague vs. weakly informative)
+	\item Checking algorithm (even if implemented correctly, could have some trouble, e.g. the funnel of death)
+	\item Checking posterior (make sure it kinda looks like the data)
+\end{itemize}
+
+The example that they use throughout the paper is this problem of predicting pollution level in areas without the sensors that can measure it, using this technique called regression calibration, which in general takes some variable that's related to the variable of interest but more widely available and finds the relationship between them given the data available. In this case, the variable that they use for calibration is satellite measurements of aerosol optical depth, which measures how much aerosols in the atmosphere block light by absorption or scattering
+
+\end{document}
