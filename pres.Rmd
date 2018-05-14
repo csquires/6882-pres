@@ -26,18 +26,6 @@ GM@data <- GM@data %>%
   )
 ```
 
-Data-derived clustering for comparison with clustering induced by super-region labels
-```{r}
-average <- 
-  GM@data %>% 
-  group_by(iso3) %>% 
-  summarise(pm25 = mean(pm25))
-d <- dist(average)
-hh <- hclust(d)
-clust <- cutree(hh,k = 6)
-GM@data$cluster_region <-
-  sapply(GM@data$iso3, function(x) clust[which(average$iso3 == x)])
-```
 
 What variables are available in this data set?
 ```{r}
@@ -106,7 +94,7 @@ plot1 <- ggplot(GM@data, aes(y = log_pm25, x = log_sat)) +
 plot(plot1)
 ```
 
-Plot of pariculate matter vs satellite data colored by region
+Model used in the paper
 ```{r}
 xylabs <- labs(
   x = expression(log(satellite)), 
@@ -191,19 +179,34 @@ plot(plot2)
 ```
 
 
-Same plot as above + separate fits for each cluster
+Derive labels from the data based on average PM2.5 concentration in each country
 ```{r}
+average <- 
+  GM@data %>% 
+  group_by(iso3) %>% 
+  summarise(pm25 = mean(pm25))
+d <- dist(average)
+hh <- hclust(d)
+clust <- cutree(hh,k = 6)
+GM@data$cluster_region <-
+  sapply(GM@data$iso3, function(x) clust[which(average$iso3 == x)])
+
+print(table(GM@data$cluster_region))
+
 cluster_color_manual = scale_color_manual(
     values = 
       c("4" = "#00C094",
-        "1" = "#FB61D7",
+        "1" = "#FB61D7", 
         "5" = "#53B400",
         "2" = "#A58AFF",
         "3" = "#00B6EB",
         "6" = "#C49A00",
         "7" = "#F8766D")
   )
+```
 
+
+```{r}
 plot3 <-
   ggplot(GM@data, aes(
     y = log_pm25,
@@ -219,8 +222,11 @@ plot3 <-
   ) + 
   geom_smooth(aes(colour = as.factor(cluster_region)), method = lm) + 
   coord_equal() +
-  xylabs +
-  legend_none()
+  guides(color = guide_legend(
+    title = NULL,
+    override.aes = list(alpha = 1, size = 2)
+  )) +
+  xylabs
 
 plot(plot3)
 ```
