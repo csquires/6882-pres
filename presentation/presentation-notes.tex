@@ -29,6 +29,31 @@ The approach the authors advocate is an iterative one of model extension, where 
 	\item Checking posterior (make sure it kinda looks like the data)
 \end{itemize}
 
-The example that they use throughout the paper is this problem of predicting pollution level in areas without the sensors that can measure it, using this technique called regression calibration, which in general takes some variable that's related to the variable of interest but more widely available and finds the relationship between them given the data available. In this case, the variable that they use for calibration is satellite measurements of aerosol optical depth, which measures how much aerosols in the atmosphere block light by absorption or scattering
+The example that they use throughout the paper is this problem of predicting pollution level in areas without the sensors that can measure it, using this technique called regression calibration, which in general takes some variable that's related to the variable of interest but more widely available and finds the relationship between them given the data available. In this case, the variable that they use for calibration is satellite measurements of aerosol optical depth, which measures how much aerosols in the atmosphere block light by absorption or scattering.
+\\
+
+The first model they start out with is a simple linear regression between the log of the particulate matter concentration and the log of the aerosol optical depth. Even here a lot of choices are already being made: we're ignoring all of the information about location and picking linear regression on their log scales, rather than linear regression on the original scale or a more sophisticated regression like GPR.
+\\
+
+*Show plots using other regressions and final regression*
+\\
+
+When they think about ways to expand this model, they make an offhand comment about Simpson's paradox. This is actually a really important point because its connected to one of the main reasons that we would want to expand a model: there are some confounding variables we're not taking into account. The example of Simpson's paradox that I've always seen is in the context of medical treatments and I thought it would be nice to walk through that and give some perspective then link it back to the current problem.
+\\
+
+* draw medical treatment example on board*
+\\
+
+* draw regression example on board*
+\\
+
+Here's where they start considering the location information from the data. I guess partially because it's easier to show, but also because they don't want to divide up the data too much, they use the super-region information rather than country or city. Now when they do the regression, they see some variation in the slopes around the slope they got when using all the data together. So the next thing they come up with is a model where there's a baseline slope and intercept and there's some variation around that.
+\\
+
+* draw original model and hierarchical model on board*
+\\
+
+And finally they give a third model that gives us an idea for an alternative when we don't have labels, and actually ends up performing better when we get to the section on posterior predictive checks. Instead of using labels, we can essentially assign them ourselves by running some sort of clustering like K-means, which would work really well for the Simpson's paradox example. What they actually do is group all the ground monitor measurements from a country together into a unit, then cluster the countries based on their average particulate matter concentration. 
+
 
 \end{document}

@@ -10,6 +10,7 @@ library(rstan)
 library(loo)
 library(ggplot2)
 library(bayesplot)
+library(glmnet)
 theme_set(bayesplot::theme_default(base_size = 14))
 
 # load 'GM' SpatialPointsDataFrame
@@ -38,6 +39,73 @@ GM@data$cluster_region <-
   sapply(GM@data$iso3, function(x) clust[which(average$iso3 == x)])
 ```
 
+What variables are available in this data set?
+```{r}
+print(colnames(GM@data))
+```
+
+Regression on the original values instead of in log-domain
+```{r}
+xylabs <- labs(
+  x = expression(satellite), 
+  y = expression(PM[2.5])
+)
+region_color_manual = scale_color_manual(
+    values = 
+      c("E-Eur/C-Eur/C-Asia" = "#00C094",
+        "HighIncome" = "#FB61D7",
+        "LatAm/Carib" = "#53B400",
+        "N-Afr/MidEast" = "#A58AFF",
+        "S-Asia" = "#00B6EB",
+        "SE-Asia/E-Asia/Oceania" = "#C49A00",
+        "Sub-Saharan Afr" = "#F8766D")
+  )
+
+plot1 <- ggplot(GM@data, aes(y = pm25, x = sat_2014)) +
+  geom_point(aes(color = super_region_name), alpha = 0.4, size = rel(0.8)) +
+  region_color_manual +
+  geom_smooth(method = lm, color = "black", size = 0.5, linetype = 2) +
+  coord_equal() +
+  xylabs +
+  guides(color = guide_legend(
+    title = NULL,
+    override.aes = list(alpha = 1, size = 2)
+  )) +
+  theme(legend.text = element_text(size = rel(0.6)))
+plot(plot1)
+```
+
+Fitting a second degree polynomial instead
+```{r}
+xylabs <- labs(
+  x = expression(log(satellite)), 
+  y = expression(log(PM[2.5]))
+)
+region_color_manual = scale_color_manual(
+    values = 
+      c("E-Eur/C-Eur/C-Asia" = "#00C094",
+        "HighIncome" = "#FB61D7",
+        "LatAm/Carib" = "#53B400",
+        "N-Afr/MidEast" = "#A58AFF",
+        "S-Asia" = "#00B6EB",
+        "SE-Asia/E-Asia/Oceania" = "#C49A00",
+        "Sub-Saharan Afr" = "#F8766D")
+  )
+
+plot1 <- ggplot(GM@data, aes(y = log_pm25, x = log_sat)) +
+  geom_point(aes(color = super_region_name), alpha = 0.4, size = rel(0.8)) +
+  region_color_manual +
+  geom_smooth(method = glm, formula=y~poly(x, 2), color = "black", size = 0.5, linetype = 2) +
+  coord_equal() +
+  xylabs +
+  guides(color = guide_legend(
+    title = NULL,
+    override.aes = list(alpha = 1, size = 2)
+  )) +
+  theme(legend.text = element_text(size = rel(0.6)))
+plot(plot1)
+```
+
 Plot of pariculate matter vs satellite data colored by region
 ```{r}
 xylabs <- labs(
@@ -56,15 +124,15 @@ region_color_manual = scale_color_manual(
   )
 
 plot1 <- ggplot(GM@data, aes(y = log_pm25, x = log_sat)) +
-  geom_point(aes(color = super_region_name), alpha = 0.4, size = rel(0.8)) + 
+  geom_point(aes(color = super_region_name), alpha = 0.4, size = rel(0.8)) +
   region_color_manual +
-  geom_smooth(method = lm, color = "black", size = 0.5, linetype = 2) + 
+  geom_smooth(method = lm, color = "black", size = 0.5, linetype = 2) +
   coord_equal() +
-  xylabs + 
+  xylabs +
   guides(color = guide_legend(
-    title = NULL, 
+    title = NULL,
     override.aes = list(alpha = 1, size = 2)
-  )) + 
+  )) +
   theme(legend.text = element_text(size = rel(0.6)))
 plot(plot1)
 ```
@@ -77,7 +145,26 @@ r4 <- subset(GM@data, super_region==4)
 r5 <- subset(GM@data, super_region==5)
 r6 <- subset(GM@data, super_region==6)
 r7 <- subset(GM@data, super_region==7)
+```
 
+```{r}
+b1 <- lm(r1$log_pm25 ~ r1$log_sat)
+print(b1$coefficients)
+b2 <- lm(r2$log_pm25 ~ r2$log_sat)
+print(b2$coefficients)
+b3 <- lm(r3$log_pm25 ~ r3$log_sat)
+print(b3$coefficients)
+b4 <- lm(r4$log_pm25 ~ r4$log_sat)
+print(b4$coefficients)
+b5 <- lm(r5$log_pm25 ~ r5$log_sat)
+print(b5$coefficients)
+b6 <- lm(r6$log_pm25 ~ r6$log_sat)
+print(b6$coefficients)
+b7 <- lm(r7$log_pm25 ~ r7$log_sat)
+print(b7$coefficients)
+```
+
+```{r}
 plot_r1 <- ggplot(r3, aes(y = log_pm25, x = log_sat)) +
   geom_point(aes(colour = super_region_name), alpha = 0.2, size = rel(0.75)) + 
   region_color_manual +
