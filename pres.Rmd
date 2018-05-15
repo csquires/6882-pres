@@ -178,6 +178,56 @@ plot2 <- ggplot(GM@data, aes(y = log_pm25, x = log_sat)) +
 plot(plot2)
 ```
 
+```{r}
+average <- 
+  GM@data %>% 
+  group_by(iso3) %>% 
+  summarise(pm25 = mean(pm25))
+d <- dist(average)
+hh <- hclust(d)
+clust <- cutree(hh,k = 4)
+GM@data$cluster_region <-
+  sapply(GM@data$iso3, function(x) clust[which(average$iso3 == x)])
+
+cluster_color_manual = scale_color_manual(
+    values = 
+      c("4" = "#00C094",
+        "1" = "#FB61D7", 
+        "5" = "#53B400",
+        "2" = "#A58AFF",
+        "3" = "#00B6EB",
+        "6" = "#C49A00",
+        "7" = "#F8766D")
+  )
+
+print(table(GM@data$cluster_region))
+```
+
+```{r}
+plot3 <-
+  ggplot(GM@data, aes(
+    y = log_pm25,
+    x = log_sat
+  )) + 
+  geom_point(aes(colour = as.factor(cluster_region)), alpha = 0.2, size = rel(0.75)) + 
+  cluster_color_manual +
+  geom_smooth(
+    method = lm, 
+    color = "black", 
+    size = 0.5, 
+    linetype = 2
+  ) + 
+  geom_smooth(aes(colour = as.factor(cluster_region)), method = lm) + 
+  coord_equal() +
+  guides(color = guide_legend(
+    title = NULL,
+    override.aes = list(alpha = 1, size = 2)
+  )) +
+  xylabs
+
+plot(plot3)
+```
+
 
 Derive labels from the data based on average PM2.5 concentration in each country
 ```{r}
