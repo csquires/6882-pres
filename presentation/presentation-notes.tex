@@ -83,8 +83,8 @@ There's a debate on how prior should be chosen. There's a couple of types of pri
 \begin{itemize}
 \item[-] non informative priors: this is seen as just a step in the Bayesian workflow, it does not incorporate much information
 \item[-] fully informative prior: in a way, it strongly captures the information we have about the problem.
-\item[-] weakly informative  prior: a weaker version of strongly, will discuss more in a bit
-\item[-] conjugate prior: just makes comutation easier
+\item[-] weakly informative  prior: a weaker version of fully informative, will discuss more in a bit
+\item[-] conjugate prior: just makes computation easier
 \item[-] regularizing prior: in genre
 \end{itemize}
 
@@ -104,7 +104,7 @@ So we basically have a generative model and we can already generate some $y$'s, 
 \textbf{Sex-attractivness example}
 
 *** BOARD WORK*** \\
-There's a paper called "Beautiful parents have more daughters" by Kanazawa (2017) were they measured in some way adolescents' attractiveness on a scale from 1-5 then recoreded the sex of these people's children. Sample size was $\sim 3000$. In the sample there was a positive correlation betwen attractivness and sex ratios. The paper reports a comparison between the most attractive group (5) and the others (1-4) sex ratios: the difference was $8\%$ more girls for group 5, with standard error $3.3\%$. We have wo things here the prbability of girl birth for group $5$, $p_1$ and the others, $p_2$, the difference is $\delta = p_1 - p_2$.\\
+There's a paper called ``Beautiful parents have more daughters" by Kanazawa (2017) where they measured in some way adolescents' attractiveness on a scale from 1-5 then recorded the sex of these people's children. Sample size was $\sim 3000$. In the sample there was a positive correlation betwen attractivness and sex ratios. The paper reports a comparison between the most attractive group (5) and the others (1-4) sex ratios: the difference was $8\%$ more girls for group 5, with standard error $3.3\%$. We have two things here the prbability of girl birth for group $5$, $p_1$ and the others, $p_2$, the difference is $\delta = p_1 - p_2$.\\
 
 \noindent Uniform prior:\\ 
 post $\propto$ likelihood. We get a normal $\mathcal{N}(0.08, 0.033^2)$ which implies that there's a $99.2\%$ chance that beautiful parents are more likely to have girls, and an implied $50\%$ chance that the difference is higher than $8\%$. 
