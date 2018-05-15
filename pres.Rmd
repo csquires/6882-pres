@@ -280,3 +280,263 @@ plot3 <-
 
 plot(plot3)
 ```
+
+```{r}
+# Prior predictive simulations --------------------------------------------
+
+# Inverse Gamme distribution. 
+library(gridExtra)
+library(grid)
+library(invgamma)
+library(ggplot2); theme_set(theme_bw())
+x <- seq(0, 500, .01)
+qplot(x, dinvgamma(x, 1, 1), geom = "line") -> plot1
+qplot(x, dinvgamma(x, 1, 100), geom = "line") -> plot2
+#qplot(x, 1/dinvgamma(x, 1, 1), geom = "line") -> plot3
+#qplot(x, 1/dinvgamma(x, 1, 100), geom = "line") -> plot4
+#qplot(x, dinvgamma(x, 2, 100), geom = "line") -> plot3
+#qplot(x, dinvgamma(x, 4, 100), geom = "line") -> plot4
+
+grid.arrange(plot1, plot2, ncol = 2)
+```
+```{r}
+# Plot: prior predictive with vague priors
+set.seed(seed = 1923840483)
+
+tau0 <- 1 / sqrt(rgamma(1, 1, rate = 100))
+tau1 <- 1 / sqrt(rgamma(1, 1, rate = 100))
+sigma <- 1 / sqrt(rgamma(1, 1, rate = 100))
+beta0i <- rnorm(8, 0, tau0)
+beta1i <- rnorm(8, 0, tau1)
+beta0 <- rnorm(1, 0, 100)
+beta1 <- rnorm(1, 0, 100)
+
+Nsim <- length(GM@data$super_region)
+xysim_labs <- labs(
+  x = expression(paste("Observed ", log(PM[2.5]))),
+  y = "Simulated data (log scale)"
+)
+
+data1 <- data.frame(
+  log_pm25 = GM$log_pm25,
+  sim = beta0 + beta0i[GM$super_region] +
+    (beta1 + beta1i[GM$super_region]) * GM$log_sat +
+    rnorm(Nsim, mean = 0, sd = sigma)
+)
+
+theme_set(bayesplot::theme_default(base_size = 18))
+theme_update(axis.text = element_text(size = 20))
+
+ggplot(data1, aes(x = log_pm25, y = sim)) + 
+  geom_point(alpha = 0.1, color = "red") + 
+  xysim_labs + ggtitle("Vague Recommended Priors")
+ggsave(filename = "plots/prior_pred_vague.png", width = 4.5, height = 3.75)
+```
+
+```{r}
+# Plot: prior predictive with weakly informative priors
+set.seed(seed = 1923840479)
+tau0 <- abs(rnorm(1, 0, 1))
+tau1 <- abs(rnorm(1, 0, 1))
+sigma <- abs(rnorm(1, 0, 1))
+beta0i <- rnorm(8, 0, tau0)
+beta1i <- rnorm(8, 0, tau1)
+beta0 <- rnorm(1, 0, 1)
+beta1 <- rnorm(1, 1, 1)
+
+data2 <- data.frame(
+  log_pm25 = GM$log_pm25,
+  sim = beta0 + beta0i[GM$super_region] +
+    (beta1 + beta1i[GM$super_region]) * GM$log_sat +
+    rnorm(Nsim, mean = 0, sd = sigma)
+)
+
+ggplot(data2, aes(x = log_pm25, y = sim)) +
+  geom_point(alpha = 0.1) + 
+  xysim_labs + ggtitle("Weakly informative joint prior data generating process")
+ggsave(filename = "plots/prior_pred_wip.png", width = 4.5, height = 3.75)
+```
+
+```{r}
+# Plot: prior predictive with weakly informative priors (no seed)
+tau0 <- abs(rnorm(1, 0, 1))
+tau1 <- abs(rnorm(1, 0, 1))
+sigma <- abs(rnorm(1, 0, 1))
+beta0i <- rnorm(8, 0, tau0)
+beta1i <- rnorm(8, 0, tau1)
+beta0 <- rnorm(1, 0, 1)
+beta1 <- rnorm(1, 1, 1)
+
+data2 <- data.frame(
+  log_pm25 = GM$log_pm25,
+  sim = beta0 + beta0i[GM$super_region] +
+    (beta1 + beta1i[GM$super_region]) * GM$log_sat +
+    rnorm(Nsim, mean = 0, sd = sigma)
+)
+
+ggplot(data2, aes(x = log_pm25, y = sim)) +
+  geom_point(alpha = 0.1) + 
+  xysim_labs
+ggsave(filename = "plots/prior_pred_wip.png", width = 4.5, height = 3.75)
+```
+
+
+```{r}
+# Plot: prior predictive comparison
+data3 <- data.frame(
+  log_pm25 = GM$log_pm25, 
+  wip = data2$sim, 
+  vague = data1$sim
+)
+ggplot(data3, aes(x=log_pm25, y=wip)) + 
+  geom_point(alpha = 0.1) + 
+  geom_point(
+    aes(y = vague), 
+    color = "red", 
+    alpha = 0.1
+  ) + 
+  xysim_labs
+ggsave(filename = "plots/prior_pred_compare.png", width = 4.5, height = 3.75)
+```
+
+```{r}
+# Fit Stan models 1, 2, 3 -------------------------------------------------
+
+# Compile Stan programs
+# * simple.stan: simple linear regression (Model 1)
+# * hier.stan: non-centered parameterization of hierarchical model (Model 2, Model 3)
+simple_mod <- stan_model("stan/simple.stan")
+hier_mod <- stan_model("stan/hierarchical.stan")
+
+# Data for model 1
+standata1 <- with(GM@data, list(
+  N = length(log_pm25),
+  log_pm = log_pm25,
+  log_sat = log_sat
+))
+
+# Data for model 2 (using super-regions from WHO)
+standata2 <- with(GM@data, list(
+  N = length(log_pm25),
+  R = length(unique(super_region)),
+  log_pm = log_pm25,
+  log_sat = log_sat,
+  region = super_region
+))
+
+# Data for model 3 (using super-regions from clustering)
+standata3 <- standata2
+standata3$R <- length(unique(GM$cluster_region))
+standata3$region <- GM$cluster_region
+
+# Fit the models with Stan
+nuts_controls <- list(max_treedepth = 15, adapt_delta = 0.99)
+mod1 <- sampling(simple_mod, data = standata1, seed = 2402)
+mod2 <- sampling(hier_mod, data = standata2, control = nuts_controls, seed = 2402)
+mod3_diverge <- sampling(hier_mod, data = standata3, control = nuts_controls[1], seed = 2402)
+mod3 <- sampling(hier_mod, data = standata3, control = nuts_controls, seed = 2402)
+
+save(file = "stan/stanfits.RData", mod1, mod2, mod3, mod3_diverge)
+
+# Extract parameter estimates, pointwise log-lik, and posterior predictive draws
+keep_pars <- c("sigma", "beta0", "beta1", "beta0_region", "beta1_region", "tau0", "tau1")
+posterior1 <- as.array(mod1, pars = keep_pars[1:3])
+posterior2 <- as.array(mod2, pars = keep_pars)
+posterior3_diverge <- as.array(mod3_diverge, pars = keep_pars)
+posterior3 <- as.array(mod3, pars = keep_pars)
+```
+
+```{r}
+# Graphical posterior predictive checks -----------------------------------
+theme_set(bayesplot::theme_default(base_size = 14))
+y <- standata2$log_pm
+yrep1 <- as.matrix(mod1, pars = "log_pm_rep")
+yrep2 <- as.matrix(mod2, pars = "log_pm_rep")
+yrep3 <- as.matrix(mod3, pars = "log_pm_rep")
+
+samp100 <- sample(nrow(yrep1), 100)
+
+# overlaid densities
+color_scheme_set("blue")
+ppc_dens_overlay(y, yrep1[samp100, ]) + 
+  coord_cartesian(ylim = c(0, 0.7), xlim = c(0, 6)) +
+  legend_none()
+ggsave(filename = "plots/ppc_dens1.png", width = 4.5, height = 3.75)
+
+color_scheme_set("gray")
+ppc_dens_overlay(y, yrep2[samp100, ]) + 
+  coord_cartesian(ylim = c(0, 0.7), xlim = c(0, 6)) +
+  legend_none()
+ggsave(filename = "plots/ppc_dens2.png", width = 4.5, height = 3.75)
+
+color_scheme_set("red")
+ppc_dens_overlay(y, yrep3[samp100, ]) + 
+  coord_cartesian(ylim = c(0, 0.7), xlim = c(0, 6)) +
+  legend_none()
+ggsave(filename = "plots/ppc_dens3.png", width = 4.5, height = 3.75)
+```
+
+```{r}
+# stat: skew 
+skew <- function(x) {
+  xdev <- x - mean(x)
+  n <- length(x)
+  r <- sum(xdev^3) / sum(xdev^2)^1.5
+  return(r * sqrt(n) * (1 - 1/n)^1.5)
+}
+
+color_scheme_set("blue")
+ppc_stat(y, yrep1, stat = "skew", binwidth = 0.01) + 
+  xlim(0, .6) + 
+  legend_none()
+ggsave(filename = "plots/ppc_skew1.png", width = 4.5, height = 3.75)
+
+color_scheme_set("gray")
+ppc_stat(y, yrep2, stat = "skew", binwidth = 0.01) + 
+  xlim(0, .6) + 
+  legend_none()
+ggsave(filename = "plots/ppc_skew2.png", width = 4.5, height = 3.75)
+
+color_scheme_set("red")
+ppc_stat(y, yrep3, stat = "skew", binwidth = 0.01) + 
+  xlim(0, .6) + 
+  legend_none()
+ggsave(filename = "plots/ppc_skew3.png", width = 4.5, height = 3.75)
+```
+
+```{r}
+# stat: group medians
+superregion <- GM@data$super_region_name
+superregion <- factor(superregion, levels = levels(superregion)[c(2,1,3:7)])
+
+color_scheme_set("blue")
+ppc_stat_grouped(y, yrep1, 
+                 group = superregion, 
+                 stat = "median", 
+                 facet_args = list(nrow = 2)) + 
+  facet_text(size = rel(0.7)) + 
+  scale_x_continuous(breaks = function(x) pretty(x, n = 3)) +
+  legend_none()
+ggsave(filename = "plots/ppc_med_grouped1.png", height = 3, width = 7)
+
+color_scheme_set("gray")
+ppc_stat_grouped(y, yrep2, 
+                 group = superregion, 
+                 stat = "median",
+                 facet_args = list(nrow = 2)) +
+  facet_text(size = rel(0.7)) + 
+  scale_x_continuous(breaks = function(x) pretty(x, n = 3)) +
+  legend_none()
+ggsave(filename = "plots/ppc_med_grouped2.png", height = 3, width = 7)
+
+color_scheme_set("red")
+ppc_stat_grouped(y, yrep3, 
+                 group = standata3$region,
+                 stat = "median", 
+                 facet_args = list(nrow = 2)) + 
+  facet_text(size = rel(0.7)) + 
+  scale_x_continuous(breaks = function(x) pretty(x, n = 3)) +
+  legend_none()
+ggsave(filename = "plots/ppc_med_grouped3.png", height = 3, width = 7)
+```
+
